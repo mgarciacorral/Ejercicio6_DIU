@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Ejercicio6_DIU:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Ejercicio6_DIU_jar</output-path>
+    <root id="archive" name="Ejercicio6_DIU.jar">
+      <element id="module-output" name="Ejercicio6_DIU" />
+    </root>
+  </artifact>
+</component>

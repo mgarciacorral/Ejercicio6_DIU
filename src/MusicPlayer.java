@@ -19,8 +19,8 @@ public class MusicPlayer extends JFrame
     private JSlider prorgess = new JSlider();
     private JLabel segundos = new JLabel();
     private JLabel icono = new JLabel();
-    private ImageIcon[] icon = new ImageIcon[3];
-    private File[] audios = new File[3];
+    private ImageIcon[] icon = new ImageIcon[4];
+    private File[] audios = new File[4];
     private JPanel botones = new JPanel();
     private JPanel barraP = new JPanel();
     private JPanel imagen = new JPanel();
@@ -59,16 +59,18 @@ public class MusicPlayer extends JFrame
         audios[0] = new File("src/resources/Nocturne in E flat major Op.9 No.2 - Frédéric François Chopin.wav");
         audios[1] = new File("src/resources/Double Violin Concerto 1st Movement - Johann Sebastian Bach.wav");
         audios[2] = new File("src/resources/Sonata No.13 - Ludwig Van Beethoven.wav");
+        audios[3] = new File("src/resources/PerdioSuVidaEnElLol.wav");
 
         icon[0] = new ImageIcon("src/resources/Nocturne in E flat major Op.9 No.2 - Frédéric François Chopin.png");
         icon[1] = new ImageIcon("src/resources/Double Violin Concerto 1st Movement - Johann Sebastian Bach.png");
         icon[2] = new ImageIcon("src/resources/Sonata No.13 - Ludwig Van Beethoven.png");
+        icon[3] = new ImageIcon("src/resources/PerdioSuVidaEnElLol.png");
 
         ponerClip();
 
         alante.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if(contador < 2){
+                if(contador < 3){
                     contador++;
                 } else {
                     contador = 0;
@@ -109,7 +111,7 @@ public class MusicPlayer extends JFrame
                 if(contador > 0){
                     contador--;
                 } else {
-                    contador = 2;
+                    contador = 3;
                 }
 
                 ponerClip();
