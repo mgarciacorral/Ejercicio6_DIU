@@ -11,74 +11,87 @@ public class MusicPlayer extends JFrame
 {
     private Clip clip;
     private File audio;
-    JButton play = new JButton();
-    JButton stop = new JButton();
-    JButton pause = new JButton();
-    JButton open = new JButton();
-    JSlider prorgess = new JSlider();
-    JLabel segundos = new JLabel();
+    private int contador = 0;
+    private JButton play = new JButton();
+    private JButton atras = new JButton();
+    private JButton pause = new JButton();
+    private JButton alante = new JButton();
+    private JSlider prorgess = new JSlider();
+    private JLabel segundos = new JLabel();
+    private JLabel icono = new JLabel();
+    private ImageIcon[] icon = new ImageIcon[3];
+    private File[] audios = new File[3];
+    private JPanel botones = new JPanel();
+    private JPanel barraP = new JPanel();
+    private JPanel imagen = new JPanel();
+
     public MusicPlayer()
     {
-        setSize(400, 100);
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        setSize(400, 400);
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setTitle("Reproductor de audio");
-        setIconImage(new ImageIcon("src/resources/play.png").getImage());
+        setIconImage(new ImageIcon("src/resources/icono.png").getImage());
 
-        UIManager.LookAndFeelInfo looks[];
-        looks = UIManager.getInstalledLookAndFeels();
-        try{
-            UIManager.setLookAndFeel(looks[1].getClassName());
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch(Exception e) {}
+        imagen.setLayout(new BorderLayout());
 
-        add(open);
-        add(play);
-        add(pause);
-        add(stop);
-        add(prorgess);
-        add(segundos);
+        imagen.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 10));
+        barraP.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        imagen.add(icono, BorderLayout.CENTER);
+        botones.add(atras);
+        botones.add(play);
+        botones.add(pause);
+        botones.add(alante);
+        barraP.add(prorgess);
+        barraP.add(segundos);
 
-        open.setIcon(new ImageIcon("src/resources/abrir.png"));
+        add(imagen);
+        add(botones);
+        add(barraP);
+
+        atras.setIcon(new ImageIcon("src/resources/backward.png"));
         play.setIcon(new ImageIcon("src/resources/play.png"));
-        pause.setIcon(new ImageIcon("src/resources/pausa.png"));
-        stop.setIcon(new ImageIcon("src/resources/stop.png"));
+        pause.setIcon(new ImageIcon("src/resources/pause.png"));
+        alante.setIcon(new ImageIcon("src/resources/forward.png"));
         prorgess.setValue(0);
+        prorgess.setEnabled(false);
         segundos.setText("0:00");
 
-        todo0();
-        open.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                todo0();
-                JFileChooser file = new JFileChooser();
-                file.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("WAV file", "wav"));
-                file.showOpenDialog(open);
-                audio = file.getSelectedFile();
+        audios[0] = new File("src/resources/Nocturne in E flat major Op.9 No.2 - Frédéric François Chopin.wav");
+        audios[1] = new File("src/resources/Double Violin Concerto 1st Movement - Johann Sebastian Bach.wav");
+        audios[2] = new File("src/resources/Sonata No.13 - Ludwig Van Beethoven.wav");
 
-                try{
-                    clip = AudioSystem.getClip();
-                    AudioInputStream sound = AudioSystem.getAudioInputStream(audio);
-                    clip.open(sound);
-                    play.setEnabled(true);
-                    prorgess.setMaximum((int) clip.getMicrosecondLength());
-                } catch(Exception ex){
-                    JOptionPane.showMessageDialog(null,
-                            "ERROR\nNo hay fichero de audio", "alerta",
-                            JOptionPane.ERROR_MESSAGE);
+        icon[0] = new ImageIcon("src/resources/Nocturne in E flat major Op.9 No.2 - Frédéric François Chopin.png");
+        icon[1] = new ImageIcon("src/resources/Double Violin Concerto 1st Movement - Johann Sebastian Bach.png");
+        icon[2] = new ImageIcon("src/resources/Sonata No.13 - Ludwig Van Beethoven.png");
+
+        ponerClip();
+
+        alante.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(contador < 2){
+                    contador++;
+                } else {
+                    contador = 0;
                 }
+
+                ponerClip();
             }
         });
 
         play.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                play.setEnabled(false);
-                pause.setEnabled(true);
-                stop.setEnabled(true);
                 new Thread(new Runnable() {
                     public void run() {
                         clip.start();
                         while(clip.getMicrosecondPosition() < clip.getMicrosecondLength()){
                             prorgess.setValue((int) clip.getMicrosecondPosition());
-                            segundos.setText((int) clip.getMicrosecondPosition() / 1000000 / 60 + ":" + (int) clip.getMicrosecondPosition() / 1000000 % 60);
+
+                            if((int) clip.getMicrosecondPosition() / 1000000 % 60 < 10){
+                                segundos.setText((int) clip.getMicrosecondPosition() / 1000000 / 60 + ":0" + (int) clip.getMicrosecondPosition() / 1000000 % 60);
+                            }else
+                            {
+                                segundos.setText((int) clip.getMicrosecondPosition() / 1000000 / 60 + ":" + (int) clip.getMicrosecondPosition() / 1000000 % 60);
+                            }
                         }
                     }
                 }).start();
@@ -87,22 +100,19 @@ public class MusicPlayer extends JFrame
 
         pause.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                play.setEnabled(true);
-                pause.setEnabled(false);
-                stop.setEnabled(true);
                 clip.stop();
             }
         });
 
-        stop.addActionListener(new ActionListener() {
+        atras.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                play.setEnabled(true);
-                pause.setEnabled(false);
-                stop.setEnabled(false);
-                clip.stop();
-                clip.setMicrosecondPosition(0);
-                prorgess.setValue(0);
-                segundos.setText("0:00");
+                if(contador > 0){
+                    contador--;
+                } else {
+                    contador = 2;
+                }
+
+                ponerClip();
             }
         });
 
@@ -111,12 +121,20 @@ public class MusicPlayer extends JFrame
         setVisible(true);
     }
 
-    private void todo0()
+    private void ponerClip()
     {
-        play.setEnabled(false);
-        pause.setEnabled(false);
-        stop.setEnabled(false);
-        prorgess.setEnabled(false);
-        prorgess.setValue(0);
+        audio = audios[contador];
+        icono.setIcon(icon[contador]);
+
+        try{
+            clip = AudioSystem.getClip();
+            AudioInputStream sound = AudioSystem.getAudioInputStream(audio);
+            clip.open(sound);
+            prorgess.setMaximum((int) clip.getMicrosecondLength());
+        } catch(Exception ex){
+            JOptionPane.showMessageDialog(null,
+                    "ERROR\nNo hay fichero de audio", "alerta",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
